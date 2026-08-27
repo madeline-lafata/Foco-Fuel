@@ -1,0 +1,750 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoCo Fuel — Fuel your day</title>
+
+<style>
+  /* Clean, readable-on-a-phone styling. Nothing fancy. */
+  :root {
+    --line: #e2e2e2; --muted: #666; --accent: #0a7d3f; --accent-soft: #eef4ef;
+    --card: #fff; --shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    margin: 0 auto; padding: 16px; max-width: 640px;
+    color: #1a1a1a; line-height: 1.4; background: #fafafa;
+  }
+  h1 { font-size: 22px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .step-label { font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    color: var(--accent); text-transform: uppercase; margin: 0 0 8px; }
+
+  /* --- Panels --- */
+  .panel { background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
+  details.panel > summary { list-style: none; cursor: pointer; font-weight: 600; }
+  details.panel > summary::-webkit-details-marker { display: none; }
+  details.panel > summary::after { content: " ▾"; color: var(--muted); }
+  details.panel[open] > summary::after { content: " ▴"; }
+
+  /* --- Controls --- */
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .field { flex: 1 1 140px; }
+  label.cap { font-size: 12px; color: var(--muted); display: block; margin-bottom: 3px; }
+  select, input[type=date] {
+    font-size: 16px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;
+    width: 100%; background: #fff;
+  }
+  .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 6px 12px; margin-top: 6px; }
+  .checks label { font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  .saved { color: var(--accent); font-size: 12px; margin-left: 8px; }
+  .hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+
+  /* --- Demand buttons --- */
+  .demand { display: flex; flex-wrap: wrap; gap: 8px; }
+  .demand button {
+    flex: 1 1 auto; font-size: 14px; font-weight: 600; padding: 10px 12px;
+    border: 1.5px solid #ccc; border-radius: 999px; background: #fff; cursor: pointer;
+    color: #333;
+  }
+  .demand button.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  /* --- Plate --- */
+  #plateNote { font-size: 15px; font-weight: 600; margin: 2px 0 4px; }
+  .ai-summary { background: var(--accent-soft); border: 1px dashed #bcd7c4;
+    color: #245c38; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .card .role { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--accent); }
+  .card .name { font-weight: 700; font-size: 17px; margin: 2px 0; }
+  .card .portion { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .card .reason { font-size: 13px; color: #444; margin: 2px 0 8px; }
+  .macros { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; margin-bottom: 8px; }
+  .macros span { color: var(--muted); }
+  .macros b { color: #1a1a1a; }
+  .macros .unknown { color: #b00; font-weight: 400; }
+  .swap { font-size: 13px; font-weight: 600; color: var(--accent); background: #fff;
+    border: 1.5px solid var(--accent); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .swap:disabled { color: #aaa; border-color: #ddd; cursor: default; }
+
+  /* --- Loading state (AI call takes ~9s) --- */
+  .loading { display: flex; align-items: center; gap: 12px; color: var(--muted);
+    padding: 24px 4px; font-size: 15px; }
+  .spinner { width: 22px; height: 22px; border: 3px solid #d9e6dd;
+    border-top-color: var(--accent); border-radius: 50%; flex: 0 0 auto;
+    animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* --- Server-composed plates --- */
+  #plateHead { font-size: 15px; font-weight: 600; margin: 2px 0 12px; }
+  .plate-block { margin: 0 0 24px; }
+  .plate-head { font-size: 12px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .plate-why { font-size: 14px; color: #333; margin: 0 0 8px; }
+  .portion-cue { background: var(--accent-soft); border-left: 4px solid var(--accent);
+    border-radius: 6px; padding: 9px 12px; font-size: 14px; color: #245c38;
+    font-weight: 600; margin-bottom: 10px; }
+
+  /* --- Sample-data marker (never mistake demo data for live) --- */
+  #sampleNotice { display: none; }
+  #sampleNotice.on { display: block; }
+  .sample-notice {
+    background: #fff4e5; border: 1px solid #f0b76b; border-left: 5px solid #e8890c;
+    color: #7a4a00; border-radius: 10px; padding: 10px 13px; margin: 0 0 14px;
+    font-size: 13px; line-height: 1.45;
+  }
+  .sample-notice b { color: #8a4b00; }
+  .sample-chip {
+    display: inline-block; background: #e8890c; color: #fff; font-size: 10px;
+    font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+  }
+
+  /* --- Status / banners --- */
+  #status { padding: 10px 0; color: var(--muted); }
+  .banner { background: #fff7e6; border: 1px solid #ffd58a; color: #7a4a00;
+    padding: 12px 14px; border-radius: 10px; margin: 12px 0; font-size: 14px; }
+
+  /* --- Browse full menu (Step 1 list) --- */
+  .section-head { font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    color: var(--accent); text-transform: uppercase; margin: 18px 0 4px;
+    padding-bottom: 4px; border-bottom: 2px solid var(--accent-soft); }
+  .item { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .item .iname { font-weight: 600; font-size: 15px; }
+  .nutri { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px,1fr));
+    gap: 4px 12px; margin-top: 6px; font-size: 12px; }
+  .nutri div { display: flex; justify-content: space-between; gap: 6px;
+    border-bottom: 1px dotted #eee; padding-bottom: 2px; }
+  .nutri .k { color: var(--muted); }
+  .nutri .v { font-weight: 600; }
+  .nutri .unknown { color: #b00; font-weight: 400; }
+  .count { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+</style>
+
+<h1>FoCo Fuel</h1>
+<p class="sub">Fuel your day from what's actually being served at 53 Commons.</p>
+
+<!-- Shown ONLY when the server fell back to the bundled sample menu. -->
+<div id="sampleNotice">
+  <div class="sample-notice">
+    <b>⚠️ Sample menu — not live data.</b><br>
+    The live Dartmouth menu feed couldn’t be reached, so this is bundled demo
+    data. Item names and nutrition are real values captured earlier; the
+    allergen and dietary tags are reconstructed. <b>Don’t rely on this for a
+    real dietary decision.</b>
+  </div>
+</div>
+
+<!-- Date + meal: which menu are we fueling from -->
+<div class="panel">
+  <div class="row">
+    <div class="field">
+      <label class="cap" for="date">Date</label>
+      <input type="date" id="date">
+    </div>
+    <div class="field">
+      <label class="cap" for="meal">Meal</label>
+      <select id="meal">
+        <option>Breakfast</option>
+        <option selected>Lunch</option>
+        <option>Dinner</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 INPUT: stable dietary preferences, saved on this device -->
+<details class="panel" id="prefsPanel">
+  <summary>① Your dietary preferences <span class="saved" id="savedNote"></span></summary>
+  <p class="hint">Set once. Saved on this device and applied to every recommendation as a hard filter.</p>
+  <div style="margin-top:10px">
+    <label class="cap">Diet</label>
+    <div class="checks">
+      <label><input type="checkbox" id="pref_veg"> Vegetarian</label>
+      <label><input type="checkbox" id="pref_gf"> Gluten-free</label>
+    </div>
+  </div>
+  <div style="margin-top:10px">
+    <label class="cap">Allergens to avoid</label>
+    <div class="checks" id="allergenChecks"></div>
+  </div>
+</details>
+
+<!-- STEP 2 INPUT: today's demand, asked every session, one tap -->
+<div class="panel">
+  <p class="step-label">② Today's demand — tap one</p>
+  <p class="hint" style="margin-top:-2px">Your training load, or just how active your day is. Asked each time because it changes.</p>
+  <div class="demand" id="demand" style="margin-top:8px">
+    <button data-d="game day">Game day</button>
+    <button data-d="hard">Hard</button>
+    <button data-d="moderate">Moderate</button>
+    <button data-d="easy">Easy</button>
+    <button data-d="rest">Rest</button>
+  </div>
+</div>
+
+<div id="status"></div>
+
+<!-- The recommended plate renders here -->
+<div id="plate"></div>
+
+<!-- Step 1 preserved: the full menu, tucked away -->
+<details class="panel" id="browsePanel">
+  <summary>Browse the full FoCo menu</summary>
+  <div id="browse" style="margin-top:8px"></div>
+</details>
+
+<script>
+// ===========================================================================
+//  FoCo Fuel — browser-only app. No server, no API key, no database.
+//  Data source: Dartmouth's public menu endpoint (allows direct browser fetch).
+// ===========================================================================
+
+var FOCO_ID = "alias05"; // 53 Commons, per the PRD
+
+// Allergen labels exactly as they appear in the API's containsAllergens[].label
+var ALLERGENS = ["Dairy","Egg","Fish","Shellfish","Soy","Wheat",
+                 "Peanut","Tree-nut","Sesame","Coconut","Mustard","Pork"];
+
+// Nutrients shown on the "browse" list (full detail).
+// Nutrients shown in the browse list. The list only shows items that have ALL
+// of these, so no empty fields ever render. (Saturated fat is deliberately not
+// listed: the bundled sample menu carries no sat-fat values, so requiring it
+// would hide every sample item and leave the list blank.)
+var SHOW = [
+  { id:"calories",label:"Calories" }, { id:"protein",label:"Protein" },
+  { id:"totalCarbohydrates",label:"Carbs" }, { id:"totalFat",label:"Fat" },
+  { id:"dietaryFiber",label:"Fiber" },
+  { id:"totalSugars",label:"Sugars" }, { id:"sodium",label:"Sodium" }
+];
+
+// -------- tiny DOM helpers --------
+var $ = function(id){ return document.getElementById(id); };
+var dateEl=$("date"), mealEl=$("meal"), statusEl=$("status"),
+    plateEl=$("plate"), browseEl=$("browse");
+
+var cache = { key:null, data:null }; // remember the last day's server response
+var usingSample = false;             // true when the server served demo data
+
+// Show/hide the "sample menu" marker. Driven by the server's `source` field so
+// demo data can never be mistaken for a live menu.
+function setSampleMode(isSample){
+  usingSample = !!isSample;
+  var n=document.getElementById("sampleNotice");
+  if(n) n.className = usingSample ? "on" : "";
+}
+var prefs = { vegetarian:false, glutenFree:false, avoid:[] }; // loaded from device
+var demand = null;      // chosen each session, NOT saved
+var currentPlate = null;// slots for swapping
+
+// ---------------------------------------------------------------------------
+//  DATA LAYER — fetch + shape helpers (shared with Step 1)
+// ---------------------------------------------------------------------------
+function ymd(d){ return ""+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"); }
+function inputToYmd(v){ return (v||"").replace(/-/g,""); }
+
+// Which meal periods (and sub-locations) is this item served for, on this date?
+function servedAt(item, dateStr, period){
+  var subs=[], dates=item.datesAvailable||[];
+  for(var i=0;i<dates.length;i++){
+    if(dates[i].date!==dateStr) continue;
+    var menus=dates[i].menus||[];
+    for(var j=0;j<menus.length;j++) if(menus[j].mealPeriod===period) subs.push(menus[j].subLocation||"");
+  }
+  return subs;
+}
+
+// Raw numeric value of a nutrient, or null when blank/zero (= "unknown", never 0).
+function numOf(item, id){
+  var arr=item.nutrients||[];
+  for(var i=0;i<arr.length;i++) if(arr[i].id===id){
+    var v=arr[i].value;
+    if(v===null||v===undefined||v===""||Number(v)===0) return null;
+    return Number(v);
+  }
+  return null;
+}
+// Value + unit for display, or null if unknown.
+function dispOf(item, id){
+  var arr=item.nutrients||[];
+  for(var i=0;i<arr.length;i++) if(arr[i].id===id){
+    var v=arr[i].value;
+    if(v===null||v===undefined||v===""||Number(v)===0) return null;
+    return { value:v, unit:arr[i].unit||"" };
+  }
+  return null;
+}
+
+// A row whose name is ALL CAPS ("ENTREES", "SIDES") is a station header, not food.
+function isHeader(item){ var n=(item.itemName||"").trim(); return n.length>0 && n===n.toUpperCase(); }
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+// Ask OUR OWN server route for a day's FoCo menu. The server does the Dartmouth
+// call, the alias05 filtering, and the per-day caching; we just consume the
+// result. An empty dateStr means "let the server pick today (in Hanover)".
+// Returns the whole response object: { state, date, reason, count, mealItems }.
+function loadDay(dateStr){
+  if(dateStr && cache.key===dateStr) return Promise.resolve(cache.data);
+  var url="/api/menu"+(dateStr?("?date="+encodeURIComponent(dateStr)):"");
+  return fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    if(data && data.date){ cache.key=data.date; cache.data=data; }
+    return data;
+  });
+}
+
+// ---------------------------------------------------------------------------
+//  DIETARY HARD FILTER  (Step 2, part 2)
+//  Drop anything that violates a saved preference. Runs BEFORE any ranking.
+// ---------------------------------------------------------------------------
+function passesPrefs(item){
+  var prefLabels=(item.meetsPreferences||[]).map(function(p){return p.label;});
+  var allerg    =(item.containsAllergens||[]).map(function(a){return a.label;});
+  // Vegetarian filter also accepts Vegan (vegan is a stricter kind of vegetarian).
+  if(prefs.vegetarian && !(prefLabels.indexOf("Vegetarian")>=0 || prefLabels.indexOf("Vegan")>=0)) return false;
+  if(prefs.glutenFree && prefLabels.indexOf("Gluten-free")<0) return false;
+  for(var i=0;i<prefs.avoid.length;i++) if(allerg.indexOf(prefs.avoid[i])>=0) return false;
+  return true;
+}
+
+// ===========================================================================
+// ██  RECOMMENDATION ENGINE  ██  (rules-based, no AI — SWAPPABLE MODULE)
+// ---------------------------------------------------------------------------
+// This whole block is self-contained and DOM-free: give it a list of already
+// meal-filtered, preference-filtered items + a demand level, get back a plate.
+// Later, an AI layer can either (a) replace buildPlate(), or (b) wrap its
+// output to add a "why" sentence — see aiSummarySentence() below. Keep this
+// section independent so it's easy to swap.
+// ===========================================================================
+var RecEngine = (function(){
+
+  // Words that mark an item as a topping/condiment/garnish OR a dessert → "extra",
+  // not a main role. (Dessert words keep e.g. "Banana Choc Chip Cookies" out of the
+  // vegetable/fruit slot, where the "banana" keyword would otherwise place it.)
+  var EXTRA_WORDS = ["sauce","dressing","salsa","sour cream","syrup","butter","ketchup",
+    "mayo","mustard","cream cheese","jam","jelly","honey","dip","gravy","glaze","aioli",
+    "vinaigrette","pesto","hummus","spread","topping","sprinkle","whipped","bits","crumble",
+    "flakes","shredded","grated","diced onion","relish","chutney","condiment",
+    "cookie","cake","pie","brownie","donut","doughnut","pastry","tart","cobbler",
+    "pudding","cheesecake","cupcake","frosting","icing","choc chip","chocolate chip","ice cream",
+    "crisp","streusel","turnover","danish","scone","shortcake","parfait","smoothie","milkshake"];
+  // Bread/grain/starch words → "carb". Checked BEFORE veggie words so e.g. a
+  // "Spinach Wrap" (a tortilla) counts as a carb, not a vegetable.
+  var CARB_WORDS = ["wrap","tortilla","roll","bun","bread","bagel","pita","naan","rice",
+    "pasta","noodle","penne","spaghetti","macaroni","potato","fries","waffle","pancake",
+    "oatmeal","cereal","muffin","biscuit","couscous","quinoa","grits","polenta","dumpling",
+    "rigatoni","ziti","fettuccine","linguine","lasagna","gnocchi","orzo","ravioli","tortellini",
+    "farfalle","rotini","ramen","udon","risotto","pilaf","mac","hoagie","sub","toast"];
+  // Words that mark an item as a vegetable or fruit.
+  var VEG_WORDS = ["broccoli","carrot","spinach","kale","lettuce","salad","greens","tomato",
+    "cucumber","pepper","mushroom","zucchini","squash","green bean","asparagus","cauliflower",
+    "brussels","cabbage","beet","corn","fruit","apple","banana","orange","berry","melon",
+    "grape","pineapple","mango","peach","pear","veggie","vegetable","edamame","pea","kernel"];
+
+  // Match a keyword as a WHOLE WORD (optionally plural), not a substring — so
+  // "pea" no longer matches "spear", "corn" won't match "acorn", etc.
+  function nameHas(name, words){
+    for(var i=0;i<words.length;i++){
+      var esc=words[i].replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+      if(new RegExp("\\b"+esc+"s?\\b").test(name)) return true;
+    }
+    return false;
+  }
+
+  // Sort helper: unknown nutrition ranks LAST (never treated as 0).
+  function rank(item, id){ var v=numOf(item,id); return v===null? -1 : v; }
+
+  // Assign each item exactly ONE role using nutrition first, names as fallback.
+  function roleOf(item){
+    var name=(item.itemName||"").toLowerCase();
+    if(nameHas(name, EXTRA_WORDS)) return "extra";
+    if(nameHas(name, CARB_WORDS))  return "carb";       // bread/grain wins over veg keyword
+    if(nameHas(name, VEG_WORDS))   return "vegetable";
+    var p=numOf(item,"protein"), c=numOf(item,"totalCarbohydrates");
+    if(p!==null && p>=12) return "protein";     // clearly protein-rich
+    if(c!==null && c>=20) return "carb";         // clearly carb-rich
+    if(p!==null && p>=7)  return "protein";      // decent protein
+    if(c!==null && c>=12) return "carb";         // decent carbs
+    return "extra";
+  }
+
+  // Which roles make up the plate for each demand, in display order.
+  // High-demand days lead with a substantial carb to refuel.
+  var PLATE_PLAN = {
+    "game day": ["carb","protein","vegetable","extra"],
+    "hard":     ["carb","protein","vegetable"],
+    "moderate": ["protein","carb","vegetable"],
+    "easy":     ["protein","carb","vegetable"],
+    "rest":     ["protein","vegetable"]
+  };
+
+  // Build the plate: categorize, rank within each role, fill the plan's slots.
+  function buildPlate(items, demandLevel){
+    var pools={protein:[],carb:[],vegetable:[],extra:[]};
+    for(var i=0;i<items.length;i++) pools[roleOf(items[i])].push(items[i]);
+
+    // Sanity cap: an item listed at 900+ kcal per portion is a bulk tray, not a
+    // single plate component. Keep those out of the protein slot unless nothing
+    // else qualifies (fall back so we still recommend from what's served).
+    // Keep bulk trays (900+ kcal per listed portion) out of the protein and extra
+    // slots — they're serving containers, not a single plate component.
+    function plateSized(pool){ var f=pool.filter(function(it){ var c=numOf(it,"calories"); return c===null||c<=900; }); return f.length?f:pool; }
+    pools.protein=plateSized(pools.protein);
+    pools.extra=plateSized(pools.extra);
+
+    // Vegetable slot should be an actual vegetable/fruit, not a sugary dish that
+    // slipped through by name — keep out anything very high in sugar.
+    var realVeg=pools.vegetable.filter(function(it){ var s=numOf(it,"totalSugars"); return s===null||s<=18; });
+    if(realVeg.length) pools.vegetable=realVeg;
+
+    pools.protein.sort(function(a,b){ return rank(b,"protein")-rank(a,"protein"); });
+    pools.carb.sort(function(a,b){ return rank(b,"totalCarbohydrates")-rank(a,"totalCarbohydrates"); });
+    pools.vegetable.sort(function(a,b){ return rank(b,"dietaryFiber")-rank(a,"dietaryFiber"); });
+    pools.extra.sort(function(a,b){ return rank(b,"protein")-rank(a,"protein"); });
+
+    var plan=PLATE_PLAN[demandLevel]||PLATE_PLAN["moderate"];
+    var slots=[];
+    for(var k=0;k<plan.length;k++){
+      var role=plan[k];
+      // Only add a slot if a real item exists for it — never invent food.
+      if(pools[role].length) slots.push({ role:role, candidates:pools[role], index:0 });
+    }
+    return { demand:demandLevel, slots:slots };
+  }
+
+  // Plain-language, non-numeric reason for each card (template for now).
+  function reason(role, demandLevel){
+    var high = (demandLevel==="hard"||demandLevel==="game day");
+    var low  = (demandLevel==="rest");
+    if(role==="protein") return high ? "Protein to rebuild muscle after a demanding day"
+                          : low  ? "Protein to support recovery on a rest day"
+                                 : "Protein to keep you steady through the day";
+    if(role==="carb")    return high ? "Substantial carbs to refuel your energy stores"
+                                     : "Carbs for steady, lasting energy";
+    if(role==="vegetable") return "Veggies or fruit for vitamins, fiber, and feeling good";
+    return high ? "A little extra to top off a big day" : "A little extra to round out the plate";
+  }
+
+  // One-line, non-numeric framing for the whole plate.
+  function plateNote(demandLevel){
+    return {
+      "game day":"A fuller plate to fuel game day.",
+      "hard":"A fuller plate to refuel after hard training.",
+      "moderate":"A balanced plate for a moderate day.",
+      "easy":"A balanced, easygoing plate for a lighter day.",
+      "rest":"A lighter, protein-and-veg-forward plate for a rest day."
+    }[demandLevel] || "A balanced plate for today.";
+  }
+
+  return { buildPlate:buildPlate, reason:reason, plateNote:plateNote, roleOf:roleOf };
+})();
+
+// ===========================================================================
+//  AI "WHY" SUMMARY — PLACEHOLDER (add later)
+//  Later this will turn the plate into ONE friendly sentence via an AI model.
+//  For now it returns null and the UI simply shows nothing. This is the single
+//  spot to wire the AI into — nothing else needs to change.
+// ===========================================================================
+function aiSummarySentence(plate, demandLevel){
+  return null; // TODO: replace with AI-generated summary sentence
+}
+
+// ---------------------------------------------------------------------------
+//  RENDER: the recommended plate
+// ---------------------------------------------------------------------------
+var ROLE_LABEL = { protein:"Protein", carb:"Carb", vegetable:"Veggie / Fruit", extra:"Extra" };
+
+function macroLine(item){
+  var order=[["calories","Cal"],["protein","Protein"],["totalCarbohydrates","Carbs"],["totalFat","Fat"]];
+  var out="";
+  for(var i=0;i<order.length;i++){
+    var d=dispOf(item, order[i][0]);
+    var v=d ? "<b>"+escapeHtml((d.value+" "+d.unit).trim())+"</b>" : '<span class="unknown">unknown</span>';
+    out+="<span>"+order[i][1]+": "+v+"</span>";
+  }
+  return out;
+}
+
+function renderPlate(){
+  if(!currentPlate){ plateEl.innerHTML=""; return; }
+  var slots=currentPlate.slots;
+  if(slots.length===0){
+    plateEl.innerHTML='<div class="banner">Nothing on this meal fits your current filters. '+
+      'Try another meal, or loosen a dietary filter in section ①.</div>';
+    return;
+  }
+
+  var html="";
+
+  // <!-- AI SUMMARY GOES HERE --> (shown only once aiSummarySentence returns text)
+  var ai=aiSummarySentence(currentPlate, currentPlate.demand);
+  if(ai) html+='<div class="ai-summary">'+escapeHtml(ai)+'</div>';
+
+  html+='<p id="plateNote">'+escapeHtml(RecEngine.plateNote(currentPlate.demand))+'</p>';
+
+  for(var i=0;i<slots.length;i++){
+    var s=slots[i], it=s.candidates[s.index];
+    var many=s.candidates.length>1;
+    html+='<div class="card">'+
+      '<div class="role">'+ROLE_LABEL[s.role]+'</div>'+
+      '<div class="name">'+escapeHtml(it.itemName)+
+        (it.portionSize?' <span class="portion">('+escapeHtml(it.portionSize)+')</span>':'')+'</div>'+
+      '<div class="reason">'+escapeHtml(RecEngine.reason(s.role,currentPlate.demand))+'</div>'+
+      '<div class="macros">'+macroLine(it)+'</div>'+
+      '<button class="swap" data-slot="'+i+'"'+(many?'':' disabled')+'>'+
+        (many?'Swap ('+(s.index+1)+'/'+s.candidates.length+')':'Only option')+'</button>'+
+    '</div>';
+  }
+  plateEl.innerHTML=html;
+
+  // Wire up swaps: advance to the next available item in the SAME role.
+  var btns=plateEl.querySelectorAll(".swap");
+  for(var b=0;b<btns.length;b++) btns[b].addEventListener("click",function(){
+    var idx=Number(this.getAttribute("data-slot"));
+    var slot=currentPlate.slots[idx];
+    slot.index=(slot.index+1)%slot.candidates.length;
+    renderPlate();
+  });
+}
+
+// ---------------------------------------------------------------------------
+//  RENDER: the full menu list (Step 1, preserved under a toggle)
+// ---------------------------------------------------------------------------
+// True only if EVERY nutrient this view displays has a real value. Items with
+// any unknown/blank macro are hidden so the list never shows empty fields.
+function hasCompleteNutrition(item){
+  for(var i=0;i<SHOW.length;i++) if(dispOf(item, SHOW[i].id)===null) return false;
+  return true;
+}
+
+function renderBrowse(shown, period, dateStr){
+  // Keep only complete-nutrition items, then drop any station header left with
+  // nothing under it (so we never render an empty section).
+  var kept=[];
+  for(var i=0;i<shown.length;i++){
+    var entry=shown[i];
+    if(isHeader(entry.item) || hasCompleteNutrition(entry.item)) kept.push(entry);
+  }
+  var pruned=[];
+  for(var j=0;j<kept.length;j++){
+    if(isHeader(kept[j].item) &&
+       (j+1>=kept.length || isHeader(kept[j+1].item))) continue; // orphan header
+    pruned.push(kept[j]);
+  }
+  shown=pruned;
+
+  var real=shown.filter(function(s){return !isHeader(s.item);}).length;
+  var html='<p class="count">'+real+" items with full nutrition · "+escapeHtml(period)+" · "+escapeHtml(dateStr)+"</p>";
+  for(var k=0;k<shown.length;k++){
+    var it=shown[k].item;
+    if(isHeader(it)){ html+='<div class="section-head">'+escapeHtml(it.itemName)+'</div>'; continue; }
+    html+='<div class="item"><div class="iname">'+escapeHtml(it.itemName)+
+      (it.portionSize?' <span class="portion">('+escapeHtml(it.portionSize)+')</span>':'')+'</div><div class="nutri">';
+    for(var s=0;s<SHOW.length;s++){
+      var d=dispOf(it,SHOW[s].id);
+      var v=d?escapeHtml((d.value+" "+d.unit).trim()):'<span class="unknown">unknown</span>';
+      html+='<div><span class="k">'+SHOW[s].label+'</span><span class="v">'+v+'</span></div>';
+    }
+    html+='</div></div>';
+  }
+  browseEl.innerHTML=html;
+}
+
+// ===========================================================================
+//  AI PLATES (server) — call POST /api/plate and render the response.
+//  The server owns safety (dietary filtering), builds the shortlist, asks the
+//  AI, validates, and falls back to its own rules plate. We just DISPLAY what
+//  comes back. If it fell back (source:"rules"), we still render it normally —
+//  the user just sees their plate, never an error.
+// ===========================================================================
+var SERVER_ROLE_LABEL = { protein:"Protein", carb:"Carb", veg:"Veggie / Fruit", other:"Extra" };
+
+function loadingHtml(text){
+  return '<div class="loading"><div class="spinner"></div><span>'+escapeHtml(text)+'</span></div>';
+}
+
+// One macro row from the server's compact macros object. null => "unknown".
+function serverMacroLine(m){
+  m=m||{};
+  var order=[["calories","Cal","kcal"],["protein","Protein","g"],["carbs","Carbs","g"],["fat","Fat","g"]];
+  var out="";
+  for(var i=0;i<order.length;i++){
+    var v=m[order[i][0]], unit=order[i][2];
+    var shown=(v===null||v===undefined)
+      ? '<span class="unknown">unknown</span>'
+      : "<b>"+escapeHtml(String(v)+(unit?(" "+unit):""))+"</b>";
+    out+="<span>"+order[i][1]+": "+shown+"</span>";
+  }
+  return out;
+}
+
+// Turn the /api/plate response into cards. Handles the empty states with a
+// friendly banner instead of a blank screen.
+function renderServerPlates(data){
+  if(!data || data.state!=="ok"){
+    var msg=(data && data.state==="no-safe-items")
+      ? "Nothing on this meal fits your current filters. Try another meal, or loosen a dietary filter in section ①."
+      : "No plate to build for this meal right now. Try another meal or date.";
+    plateEl.innerHTML='<div class="banner">'+msg+'</div>';
+    return;
+  }
+  var plates=data.plates||[];
+  if(plates.length===0){
+    plateEl.innerHTML='<div class="banner">No plate could be built for this meal. Try another meal or date.</div>';
+    return;
+  }
+
+  // Keep the top-of-page marker in sync with the source these plates came from.
+  if(data.menuSource) setSampleMode(data.menuSource==="sample");
+
+  var html='<p id="plateHead">A few plates for your <b>'+escapeHtml(data.demand||"day")+'</b> — take your pick:'+
+    (data.menuSource==="sample" ? '<span class="sample-chip">Sample menu</span>' : '')+'</p>';
+  for(var i=0;i<plates.length;i++){
+    var p=plates[i], items=p.items||[];
+    html+='<div class="plate-block">';
+    html+='<div class="plate-head">Plate '+(i+1)+'</div>';
+    if(p.why)        html+='<p class="plate-why">'+escapeHtml(p.why)+'</p>';
+    if(p.portionCue) html+='<div class="portion-cue">'+escapeHtml(p.portionCue)+'</div>';
+    for(var j=0;j<items.length;j++){
+      var it=items[j];
+      html+='<div class="card">'+
+        '<div class="role">'+escapeHtml(SERVER_ROLE_LABEL[it.role]||it.role||"")+'</div>'+
+        '<div class="name">'+escapeHtml(it.name||"")+
+          (it.portionSize?' <span class="portion">('+escapeHtml(it.portionSize)+')</span>':'')+'</div>'+
+        '<div class="macros">'+serverMacroLine(it.macros)+'</div>'+
+      '</div>';
+    }
+    html+='</div>';
+  }
+  plateEl.innerHTML=html;
+}
+
+// Call the server to compose plates. Shows a spinner while in flight (~9s).
+function buildPlateFromServer(dateStr, period){
+  plateEl.innerHTML=loadingHtml("Building your plate…");
+  var body=JSON.stringify({ date:dateStr, meal:period, demand:demand, prefs:prefs });
+  fetch("/api/plate",{ method:"POST", headers:{"Content-Type":"application/json"}, body:body })
+    .then(function(r){ return r.json(); })
+    .then(function(data){ renderServerPlates(data); })
+    .catch(function(err){
+      plateEl.innerHTML='<div class="banner"><b>Could not build your plate.</b><br>'+
+        escapeHtml(err.message||String(err))+
+        '<br><br>Make sure the local server is running (<code>python3 server.py</code>), then tap a demand again.</div>';
+    });
+}
+
+// ---------------------------------------------------------------------------
+//  ORCHESTRATION: pull data, filter, (maybe) build the plate, render both.
+// ---------------------------------------------------------------------------
+function refresh(){
+  var dateStr=inputToYmd(dateEl.value), period=mealEl.value;
+  statusEl.textContent="Loading FoCo menu…"; browseEl.innerHTML="";
+  // If a demand is already chosen, show the plate spinner right away so there's
+  // never a blank gap while the menu loads and the AI composes.
+  plateEl.innerHTML = demand ? loadingHtml("Building your plate…") : "";
+
+  loadDay(dateStr).then(function(data){
+    // Sync the date picker to the date the server actually used — important on
+    // first load, when the picker starts empty and the server fills in Hanover
+    // "today" for us.
+    var used=data.date||dateStr;
+    if(used){
+      var iso=used.replace(/(\d{4})(\d{2})(\d{2})/,"$1-$2-$3");
+      if(dateEl.value!==iso) dateEl.value=iso;
+    }
+
+    // The server tells us explicitly when there's no menu, and why.
+    if(!data || data.state!=="ok"){
+      var why = (data && data.reason==="fetch-failed")
+        ? "We couldn’t reach the Dartmouth menu server just now."
+        : "No menu is posted for 53 Commons on this date.";
+      statusEl.innerHTML='<div class="banner"><b>No menu to show for '+escapeHtml(used||"?")+'.</b><br>'+
+        why+' Try today or another upcoming weekday.</div>';
+      plateEl.innerHTML="";
+      setSampleMode(false);
+      return;
+    }
+
+    // Flag demo data the moment we know the source.
+    setSampleMode(data.source==="sample");
+
+    // Items served for this exact date + meal period.
+    var foco=data.mealItems||[], shown=[];
+    for(var i=0;i<foco.length;i++){ if(servedAt(foco[i],used,period).length) shown.push({item:foco[i]}); }
+    if(shown.length===0){
+      statusEl.innerHTML='<div class="banner">FoCo has data for '+escapeHtml(used)+
+        ', but nothing listed for <b>'+escapeHtml(period)+'</b>. Try another meal or date.</div>';
+      plateEl.innerHTML="";
+      return;
+    }
+    statusEl.textContent="";
+    renderBrowse(shown, period, used);
+
+    // Build the plate only after a demand has been tapped this session. The
+    // server composes it (AI, with a rules fallback); we just display it.
+    if(demand){
+      buildPlateFromServer(used, period);
+    } else {
+      plateEl.innerHTML='<div class="banner">Tap <b>today’s demand</b> above to build your plate.</div>';
+    }
+  }).catch(function(err){
+    statusEl.innerHTML='<div class="banner"><b>Could not load the menu.</b><br>'+
+      escapeHtml(err.message||String(err))+
+      '<br><br>Make sure the local server is running (<code>python3 server.py</code>), then reload.</div>';
+    plateEl.innerHTML="";
+  });
+}
+
+// ---------------------------------------------------------------------------
+//  PREFERENCES: load/save on this device (localStorage)
+// ---------------------------------------------------------------------------
+function loadPrefs(){
+  try{ var s=localStorage.getItem("focofuel_prefs"); if(s) prefs=JSON.parse(s); }catch(e){}
+  if(!prefs.avoid) prefs.avoid=[];
+  $("pref_veg").checked=!!prefs.vegetarian;
+  $("pref_gf").checked=!!prefs.glutenFree;
+}
+function savePrefs(){
+  prefs.vegetarian=$("pref_veg").checked;
+  prefs.glutenFree=$("pref_gf").checked;
+  prefs.avoid=ALLERGENS.filter(function(a){ return $("al_"+a).checked; });
+  try{ localStorage.setItem("focofuel_prefs", JSON.stringify(prefs)); }catch(e){}
+  var n=$("savedNote"); n.textContent="Saved ✓"; setTimeout(function(){n.textContent="";},1500);
+  refresh(); // re-filter with new prefs
+}
+
+// ---------------------------------------------------------------------------
+//  INIT
+// ---------------------------------------------------------------------------
+(function init(){
+  // Build allergen checkboxes from the real vocabulary.
+  var box=$("allergenChecks"), html="";
+  for(var i=0;i<ALLERGENS.length;i++)
+    html+='<label><input type="checkbox" id="al_'+ALLERGENS[i]+'"> '+ALLERGENS[i]+'</label>';
+  box.innerHTML=html;
+
+  loadPrefs();
+  for(var j=0;j<ALLERGENS.length;j++) $("al_"+ALLERGENS[j]).checked = prefs.avoid.indexOf(ALLERGENS[j])>=0;
+
+  // Leave the date blank on purpose: the first load asks the server, which fills
+  // in "today" using Dartmouth's Hanover timezone (not the browser's clock).
+
+  // Wire controls.
+  dateEl.addEventListener("change", refresh);
+  mealEl.addEventListener("change", refresh);
+  $("pref_veg").addEventListener("change", savePrefs);
+  $("pref_gf").addEventListener("change", savePrefs);
+  for(var k=0;k<ALLERGENS.length;k++) $("al_"+ALLERGENS[k]).addEventListener("change", savePrefs);
+
+  // Demand buttons: set the level, highlight it, rebuild the plate.
+  var dbtns=document.querySelectorAll("#demand button");
+  for(var m=0;m<dbtns.length;m++) dbtns[m].addEventListener("click",function(){
+    demand=this.getAttribute("data-d");
+    for(var n=0;n<dbtns.length;n++) dbtns[n].classList.remove("active");
+    this.classList.add("active");
+    refresh();
+  });
+
+  refresh();
+})();
+</script>

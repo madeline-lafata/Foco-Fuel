@@ -1,0 +1,207 @@
+{
+  "_README": [
+    "SAMPLE / FALLBACK MENU — NOT LIVE DARTMOUTH DATA.",
+    "Used only when the live menu fetch fails. The live API is always tried first.",
+    "",
+    "PROVENANCE — please read before trusting anything here:",
+    "  * itemName, portionSize and macros are REAL values observed from Dartmouth's",
+    "    menuapi endpoint for 53 Commons (alias05) in July 2026, before that",
+    "    endpoint was retired and redirected to Nutrislice on 2026-08-27.",
+    "  * allergens[] and preferences[] are RECONSTRUCTED — derived from what each",
+    "    food obviously is, NOT from Dartmouth's published tags. They are good",
+    "    enough to exercise the app's filtering logic in a demo, and are NOT a",
+    "    safe basis for any real dietary or allergy decision.",
+    "  * null macros mean 'unknown' (the real feed has gaps too) and are rendered",
+    "    as 'unknown', never as zero.",
+    "",
+    "The server expands these compact entries into the same shape the live API",
+    "returned, and stamps them with whatever date was requested, so everything",
+    "downstream behaves exactly as if the source were live."
+  ],
+  "capturedFrom": "menu.dartmouth.edu/menuapi/mealitems (53 Commons / alias05), July 2026",
+  "items": [
+    {
+      "id": "s-001", "name": "Griddled Chicken Breast Strips", "portionSize": "5 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 282, "protein": 52.8, "totalCarbohydrates": 0.3, "totalFat": 6.1, "dietaryFiber": 0.1, "totalSugars": null, "sodium": 480},
+      "allergens": [], "preferences": ["Gluten-free"]
+    },
+    {
+      "id": "s-002", "name": "Baked Turkey", "portionSize": "2 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": null, "protein": null, "totalCarbohydrates": null, "totalFat": null, "dietaryFiber": null, "totalSugars": null, "sodium": null},
+      "allergens": [], "preferences": ["Gluten-free"]
+    },
+    {
+      "id": "s-003", "name": "Brown Sugar Glazed Salmon", "portionSize": "4 ounces wt",
+      "meals": ["Dinner"],
+      "macros": {"calories": 343, "protein": 36.7, "totalCarbohydrates": 0.5, "totalFat": 20.5, "dietaryFiber": null, "totalSugars": null, "sodium": 320},
+      "allergens": ["Fish"], "preferences": ["Gluten-free"]
+    },
+    {
+      "id": "s-004", "name": "Scrambled Eggs", "portionSize": "4 ounces wt",
+      "meals": ["Breakfast", "Lunch"],
+      "macros": {"calories": 200, "protein": 17.7, "totalCarbohydrates": 1.6, "totalFat": 14.6, "dietaryFiber": null, "totalSugars": null, "sodium": 210},
+      "allergens": ["Egg"], "preferences": ["Vegetarian", "Gluten-free"]
+    },
+    {
+      "id": "s-005", "name": "Hard Boiled Egg", "portionSize": "1 each",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 78, "protein": 6.3, "totalCarbohydrates": 0.6, "totalFat": 5.3, "dietaryFiber": null, "totalSugars": null, "sodium": 62},
+      "allergens": ["Egg"], "preferences": ["Vegetarian", "Gluten-free"]
+    },
+    {
+      "id": "s-006", "name": "Stir Fry Tofu", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": null, "protein": null, "totalCarbohydrates": null, "totalFat": null, "dietaryFiber": null, "totalSugars": null, "sodium": null},
+      "allergens": ["Soy"], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-007", "name": "Veggie Meatballs Marinara", "portionSize": "8 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 316, "protein": 27.4, "totalCarbohydrates": 21.8, "totalFat": 14.3, "dietaryFiber": 5.2, "totalSugars": 6.1, "sodium": 640},
+      "allergens": ["Soy", "Wheat"], "preferences": ["Vegetarian"]
+    },
+    {
+      "id": "s-008", "name": "Cottage Cheese", "portionSize": "4 ounces wt",
+      "meals": ["Breakfast", "Lunch"],
+      "macros": {"calories": 110, "protein": 12.5, "totalCarbohydrates": 4.5, "totalFat": 4.5, "dietaryFiber": null, "totalSugars": 4.1, "sodium": 380},
+      "allergens": ["Dairy"], "preferences": ["Vegetarian", "Gluten-free"]
+    },
+
+    {
+      "id": "s-020", "name": "Grinder Roll", "portionSize": "1 each",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 326, "protein": 11.2, "totalCarbohydrates": 76.5, "totalFat": 2.1, "dietaryFiber": 2.8, "totalSugars": null, "sodium": 610},
+      "allergens": ["Wheat"], "preferences": ["Vegetarian", "Vegan"]
+    },
+    {
+      "id": "s-021", "name": "House Pasta", "portionSize": "6 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 316, "protein": 11.1, "totalCarbohydrates": 63.5, "totalFat": 1.3, "dietaryFiber": 3.0, "totalSugars": null, "sodium": 8},
+      "allergens": ["Wheat"], "preferences": ["Vegetarian", "Vegan"]
+    },
+    {
+      "id": "s-022", "name": "Basmati Rice", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 197, "protein": 3.5, "totalCarbohydrates": 39.6, "totalFat": 2.2, "dietaryFiber": 0.6, "totalSugars": null, "sodium": 3},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-023", "name": "Everything Bagel", "portionSize": "1 each",
+      "meals": ["Breakfast", "Lunch"],
+      "macros": {"calories": 366, "protein": 14.2, "totalCarbohydrates": 73.2, "totalFat": 1.8, "dietaryFiber": 3.1, "totalSugars": 5.4, "sodium": 570},
+      "allergens": ["Wheat", "Sesame"], "preferences": ["Vegetarian", "Vegan"]
+    },
+    {
+      "id": "s-024", "name": "Sweet Potato Fries", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 186, "protein": null, "totalCarbohydrates": 28.4, "totalFat": 7.4, "dietaryFiber": 2.6, "totalSugars": 5.9, "sodium": 240},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-025", "name": "Steamed Farro", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 170, "protein": 6.0, "totalCarbohydrates": 34.0, "totalFat": 1.0, "dietaryFiber": 5.0, "totalSugars": null, "sodium": 5},
+      "allergens": ["Wheat"], "preferences": ["Vegetarian", "Vegan"]
+    },
+    {
+      "id": "s-026", "name": "Spinach Wrap", "portionSize": "1 each",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 270, "protein": 8.4, "totalCarbohydrates": 52.3, "totalFat": 3.4, "dietaryFiber": 2.2, "totalSugars": null, "sodium": 640},
+      "allergens": ["Wheat"], "preferences": ["Vegetarian", "Vegan"]
+    },
+    {
+      "id": "s-027", "name": "Banana", "portionSize": "1 each",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 105, "protein": 1.3, "totalCarbohydrates": 27.0, "totalFat": 0.4, "dietaryFiber": 3.1, "totalSugars": 14.4, "sodium": 1},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-028", "name": "Granny Smith Apples", "portionSize": "1 each",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 77, "protein": 0.4, "totalCarbohydrates": 20.6, "totalFat": 0.3, "dietaryFiber": 3.6, "totalSugars": 15.5, "sodium": 2},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-029", "name": "Buttermilk Pancakes", "portionSize": "2 each",
+      "meals": ["Breakfast"],
+      "macros": {"calories": 290, "protein": 7.0, "totalCarbohydrates": 51.0, "totalFat": 6.5, "dietaryFiber": 1.4, "totalSugars": 9.0, "sodium": 620},
+      "allergens": ["Wheat", "Egg", "Dairy"], "preferences": ["Vegetarian"]
+    },
+
+    {
+      "id": "s-040", "name": "Summer Vegetable Ragout", "portionSize": "6 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 97, "protein": 6.5, "totalCarbohydrates": 16.0, "totalFat": 1.5, "dietaryFiber": 4.8, "totalSugars": 6.2, "sodium": 210},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-041", "name": "Broccoli Florets", "portionSize": "4 ounces wt",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 35, "protein": 2.8, "totalCarbohydrates": 7.2, "totalFat": null, "dietaryFiber": 3.3, "totalSugars": 1.5, "sodium": 33},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-042", "name": "Sugar Snap Peas", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 64, "protein": 4.3, "totalCarbohydrates": 11.2, "totalFat": 0.5, "dietaryFiber": 4.1, "totalSugars": 5.8, "sodium": 6},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-043", "name": "Romaine Lettuce", "portionSize": "4 ounces wt",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 19, "protein": 1.4, "totalCarbohydrates": 3.7, "totalFat": null, "dietaryFiber": 2.4, "totalSugars": 1.3, "sodium": 9},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-044", "name": "Baby Carrots", "portionSize": "3 ounces wt",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 35, "protein": 0.6, "totalCarbohydrates": 8.2, "totalFat": null, "dietaryFiber": 2.9, "totalSugars": 4.8, "sodium": 78},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-045", "name": "Roasted Zucchini Squash", "portionSize": "4 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 52, "protein": 1.5, "totalCarbohydrates": 5.4, "totalFat": 3.1, "dietaryFiber": 1.8, "totalSugars": 3.9, "sodium": 150},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-046", "name": "Baby Spinach", "portionSize": "3 ounces wt",
+      "meals": ["Breakfast", "Lunch", "Dinner"],
+      "macros": {"calories": 20, "protein": 2.4, "totalCarbohydrates": 3.0, "totalFat": null, "dietaryFiber": 1.9, "totalSugars": null, "sodium": 65},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+
+    {
+      "id": "s-060", "name": "Crunchy Peanut Butter", "portionSize": "1 ounce wt",
+      "meals": ["Breakfast", "Lunch"],
+      "macros": {"calories": 176, "protein": 7.2, "totalCarbohydrates": 6.4, "totalFat": 14.9, "dietaryFiber": 2.1, "totalSugars": 3.0, "sodium": 135},
+      "allergens": ["Peanut"], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-061", "name": "Hummus", "portionSize": "2 ounces wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 140, "protein": 4.0, "totalCarbohydrates": 12.0, "totalFat": 9.0, "dietaryFiber": 3.0, "totalSugars": null, "sodium": 230},
+      "allergens": ["Sesame"], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-062", "name": "Vegan Shredded Mozzarella", "portionSize": "1 ounce wt",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 79, "protein": 0.6, "totalCarbohydrates": 7.4, "totalFat": 4.8, "dietaryFiber": 0.3, "totalSugars": null, "sodium": 224},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    },
+    {
+      "id": "s-063", "name": "Sour Cream", "portionSize": "1 Fl Oz",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 57, "protein": 0.7, "totalCarbohydrates": 1.3, "totalFat": 5.6, "dietaryFiber": null, "totalSugars": null, "sodium": 14},
+      "allergens": ["Dairy"], "preferences": ["Vegetarian", "Gluten-free"]
+    },
+    {
+      "id": "s-064", "name": "Salsa", "portionSize": "1 Fl Oz",
+      "meals": ["Lunch", "Dinner"],
+      "macros": {"calories": 12, "protein": null, "totalCarbohydrates": 3.0, "totalFat": null, "dietaryFiber": 1.0, "totalSugars": 2.0, "sodium": 209},
+      "allergens": [], "preferences": ["Vegetarian", "Vegan", "Gluten-free"]
+    }
+  ]
+}

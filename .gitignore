@@ -1,0 +1,28 @@
+# --- Secrets / environment ---
+# Never commit env files — they hold API keys and other secrets.
+.env
+.env.*
+!.env.example
+
+# --- Python (server.py) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Logs & scratch ---
+*.log
+server.log
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.swp
+*~
