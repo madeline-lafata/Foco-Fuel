@@ -5,6 +5,10 @@ FoCo Fuel
 FoCo Fuel turns Dartmouth's daily dining-hall menu into targeted, training-aware meal suggestions. You tell it how hard your training load is for the day- a hard, easy, or moderate practice, a game day, or a rest day- and it curates 3 complete meals from what's being served at 53 Commons (FoCo) that day. The meals are anchored with protein and emphasize carbohydrates that scale to your training load, in line nutritionist recommendations.
 Built by **Madeline LaFata** as a portfolio product
 
+**Demo**
+
+[Watch the demo here:](https://youtu.be/GaPlCgJN6hU)
+
 **The Problem**
 
 Dartmouth students and student athletes struggle to match meal options with training load. The fueling information exists, as FoCo posts a full daily menu with per-item nutrition and Dartmouth staffed nutritionists provide additional resources and support, however these resources are often underutilized. A dietitian appointment is 1:1 and unscalable, and numerous food options are not something a hungry student wants to think about between classes, meetings, and training sessions. 
@@ -46,10 +50,6 @@ Scoping a product from a real, validated need with defensible features
 PMing an AI feature responsibly by deciding what the model is and isn't allowed to touch, designing for its failure modes, and verifying its output rather than trusting it.
 
 Handling real-world breakage. From a data source that disappeared mid-build and a vendor credential migration, I navigated this challenge without compromising the safety guarantees or shipping something misleading.
-
-**Demo**
-
-[Watch the demo here:](https://youtu.be/GaPlCgJN6hU)
 
 **Tech**
 Python (standard-library HTTP server), vanilla HTML/CSS/JS front end, Google Gemini API for plate composition. No framework dependencies. API keys are kept server-side and out of version control.
