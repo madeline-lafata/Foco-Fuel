@@ -52,4 +52,5 @@ PMing an AI feature responsibly by deciding what the model is and isn't allowed 
 Handling real-world breakage. From a data source that disappeared mid-build and a vendor credential migration, I navigated this challenge without compromising the safety guarantees or shipping something misleading.
 
 **Tech**
+
 Python (standard-library HTTP server), vanilla HTML/CSS/JS front end, Google Gemini API for plate composition. No framework dependencies. API keys are kept server-side and out of version control.
