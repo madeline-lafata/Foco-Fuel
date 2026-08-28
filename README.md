@@ -1,4 +1,4 @@
-#FoCo Fuel
+FoCo Fuel
 
 **A dietitian in your pocket for Dartmouth students and student athletes struggling to eat nutritionally in the dining hall.**
 
@@ -6,11 +6,15 @@ FoCo Fuel turns Dartmouth's daily dining-hall menu into targeted, training-aware
 Built by **Madeline LaFata** as a portfolio product
 
 **The Problem**
+
 Dartmouth students and student athletes struggle to match meal options with training load. The fueling information exists, as FoCo posts a full daily menu with per-item nutrition and Dartmouth staffed nutritionists provide additional resources and support, however these resources are often underutilized. A dietitian appointment is 1:1 and unscalable, and numerous food options are not something a hungry student wants to think about between classes, meetings, and training sessions. 
 FoCo Fuel intends to close this gap with the dietitian's recommendation delivered the moment you decide what to put on your plate.
 
 **How it Works**
+
 The core design principle comes from ACSM and ISSN sports-nutrition guidance: carbohydrate is the dial that scales with training load and protein is the constant. Hard training depletes glycogen, so carbohydrates are emphasized as training intensity increases. Protein is included to support repair every day, and vegetables are always recommended. FoCo Fuel applies these principles qualitatively using verbal emphasis and portion cues, never personal calorie or gram targets. This promotes Foco Fuel as a fueling tool, not a dieting one.
+
+
 When using the app, you pick a date, meal, and how demanding your day is. The app pulls that day's FoCo menu, filters it to what's safe for your dietary needs, and returns two to three complete plates, each with a one-line rationale and a portion cue that shifts with your training load ("go big on the rice — you've earned it today" versus "a normal scoop is plenty").
 
 Architecture: rules own safety, AI owns language
@@ -24,6 +28,7 @@ Graceful degradation is built in. If the AI call fails, times out, or returns no
 This structure means an AI hallucination can't put an allergen on someone's plate. That safety property is designed to hold in the construction of the app and throughout plate curation with AI assistance.
 
 **Project Status**
+
 This is a working pilot-stage build, developed with AI-assisted coding (Claude Code):
 
 Live and working: the full pipeline: menu ingestion, dietary/allergen filtering, role tagging, rules-based plate composition, training-load portion cues, and the browser UI with graceful loading and fallback states.
@@ -35,6 +40,7 @@ In progress: Dartmouth migrated its menu platform (from a custom API to Nutrisli
 The sample-menu state is surfaced honestly in the UI with a visible banner in the demo to never present sample data as live data.
 
 **What This Project Demonstrates**
+
 Scoping a product from a real, validated need with defensible features
 
 PMing an AI feature responsibly by deciding what the model is and isn't allowed to touch, designing for its failure modes, and verifying its output rather than trusting it.
